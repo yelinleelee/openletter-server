@@ -1,0 +1,6 @@
+PORT=3000
+DB_HOST=dev-db.c98404c20038.ap-northeast-2.rds.amazonaws.com
+DB_PORT=3306
+DB_NAME=openletter-staging
+DB_USER=admin
+DB_PASSWORD=MRM7pmqtQoWnXMt4lW5j
