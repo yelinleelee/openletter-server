@@ -1,8 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const { Property, User, Review } = require('../models');
+const { Property, User, Review, Booking } = require('../models');
 const authMiddleware = require('../middlewares/auth');
 const { Op } = require('sequelize');
+
+function expandRange(checkIn, checkOut) {
+  const result = [];
+  const start = new Date(checkIn + 'T00:00:00Z');
+  const end = new Date(checkOut + 'T00:00:00Z');
+  for (let d = new Date(start); d < end; d.setUTCDate(d.getUTCDate() + 1)) {
+    result.push(d.toISOString().slice(0, 10));
+  }
+  return result;
+}
 
 router.get('/', async (req, res, next) => {
   try {
@@ -31,6 +41,18 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/my', authMiddleware, async (req, res, next) => {
+  try {
+    const properties = await Property.findAll({
+      where: { hostId: req.user.id },
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(properties);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const property = await Property.findByPk(req.params.id, {
@@ -39,12 +61,35 @@ router.get('/:id', async (req, res, next) => {
         { model: Review, as: 'reviews' }
       ]
     });
-    
+
     if (!property) {
       return res.status(404).json({ error: '숙소를 찾을 수 없습니다' });
     }
-    
+
     res.json(property);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/:id/booked-dates', async (req, res, next) => {
+  try {
+    const bookings = await Booking.findAll({
+      where: {
+        propertyId: req.params.id,
+        status: { [Op.in]: ['pending', 'confirmed'] }
+      },
+      attributes: ['checkIn', 'checkOut']
+    });
+
+    const set = new Set();
+    for (const b of bookings) {
+      for (const day of expandRange(b.checkIn, b.checkOut)) {
+        set.add(day);
+      }
+    }
+
+    res.json([...set].sort());
   } catch (error) {
     next(error);
   }

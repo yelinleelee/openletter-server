@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const sequelize = require('../config/sequelize');
 
 const Property = sequelize.define('Property', {
   id: {
@@ -74,11 +74,11 @@ const Property = sequelize.define('Property', {
     type: DataTypes.DECIMAL(11, 8)
   },
   amenities: {
-    type: DataTypes.JSONB,
+    type: DataTypes.JSON,
     defaultValue: []
   },
   images: {
-    type: DataTypes.JSONB,
+    type: DataTypes.JSON,
     defaultValue: []
   },
   isAvailable: {
