@@ -25,6 +25,21 @@ router.get('/', authMiddleware, async (req, res, next) => {
   }
 });
 
+router.get('/host/me', authMiddleware, async (req, res, next) => {
+  try {
+    const bookings = await Booking.findAll({
+      include: [
+        { model: Property, as: 'property', where: { hostId: req.user.id }, required: true },
+        { model: User, as: 'guest', attributes: ['id', 'name', 'email'] }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(bookings);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/:id', authMiddleware, async (req, res, next) => {
   try {
     const booking = await Booking.findByPk(req.params.id, {

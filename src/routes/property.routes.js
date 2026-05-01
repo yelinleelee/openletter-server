@@ -31,6 +31,18 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+router.get('/my', authMiddleware, async (req, res, next) => {
+  try {
+    const properties = await Property.findAll({
+      where: { hostId: req.user.id },
+      order: [['createdAt', 'DESC']]
+    });
+    res.json(properties);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get('/:id', async (req, res, next) => {
   try {
     const property = await Property.findByPk(req.params.id, {
