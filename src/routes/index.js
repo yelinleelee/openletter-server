@@ -7,6 +7,7 @@ const propertyRoutes = require('./property.routes');
 const bookingRoutes = require('./booking.routes');
 const reviewRoutes = require('./review.routes');
 const messageRoutes = require('./message.routes');
+const uploadRoutes = require('./upload.routes');
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
@@ -14,5 +15,6 @@ router.use('/properties', propertyRoutes);
 router.use('/bookings', bookingRoutes);
 router.use('/reviews', reviewRoutes);
 router.use('/messages', messageRoutes);
+router.use('/upload', uploadRoutes);
 
 module.exports = router;
